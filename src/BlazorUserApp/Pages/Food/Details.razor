@@ -1,0 +1,82 @@
+@page "/Food/Details/"
+
+@inject HttpClient httpClient
+@inject ILocalStorageService LocalStorageService
+@inject NavigationManager navigationManager
+
+<PageTitle>Food Details</PageTitle>
+
+@if (food != null)
+{
+    <div class="food-container">
+        <div class="food-details">
+            <h2>@food.Name</h2>
+            <p>@food.Description</p>
+            <p><strong>Diet:</strong> @food.Diet</p>
+        </div>
+        <div class="food-media">
+            @if (!string.IsNullOrEmpty(food.VideoUrl))
+            {
+                <video controls>
+                    <source src="@food.VideoUrl" type="video/mp4">
+                </video>
+            }
+            @if (!string.IsNullOrEmpty(food.ImageUrl))
+            {
+                <img src="@food.ImageUrl" alt="Food Image" />
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+@code {
+    public class Food
+    {
+        public int Id { get; set; }
+
+        public string? Name { get; set; }
+
+        public string? Description { get; set; }
+
+        public string? VideoUrl { get; set; }
+
+        public string? ImageUrl { get; set; }
+
+        public string? Diet { get; set; }
+
+        public bool IsApproved { get; set; }
+    }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public Food food { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetFoodDetailsAsync();
+    }
+
+    private async Task GetFoodDetailsAsync()
+    {
+
+        var response = await httpClient.GetAsync($"api/Food/Details/{Id}");
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        if (response.IsSuccessStatusCode)
+        {
+            food = JsonConvert.DeserializeObject<Food>(json);
+        }
+        else
+        {
+            navigationManager.NavigateTo("/error");
+        }
+
+    }
+}

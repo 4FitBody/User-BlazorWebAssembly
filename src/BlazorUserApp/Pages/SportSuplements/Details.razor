@@ -1,0 +1,66 @@
+@page "/SportSupplements/Details"
+
+@inject HttpClient httpClient
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ILocalStorageService localStorageService
+@inject NavigationManager navigationManager
+
+<PageTitle>Sport Suplements Details</PageTitle>
+
+@if (supplement != null)
+{
+    <div class="supplement-container">
+        <div class="supplement-details">
+            <h2>@supplement.Name</h2>
+            <p><strong>Description:</strong> @supplement.Description</p>
+            <p><strong>Manufacture Country:</strong> @supplement.ManufactureCountry</p>
+            <p><strong>Quantity:</strong> @supplement.Quantity</p>
+        </div>
+        <div class="supplement-image">
+            <img src="@supplement.ImageUrl" alt="Supplement Image" />
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    public class SportSupplement
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? Description { get; set; }
+        public string? ManufactureCountry { get; set; }
+        public double? Quantity { get; set; }
+        public bool IsApproved { get; set; }
+    }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public SportSupplement supplement { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetSupplementDetailsAsync();
+    }
+
+    private async Task GetSupplementDetailsAsync()
+    {
+        var response = await httpClient.GetAsync($"api/SportSuplements/Details/{Id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            supplement = await response.Content.ReadFromJsonAsync<SportSupplement>();
+        }
+        else
+        {
+            navigationManager.NavigateTo("/error");
+        }
+    }
+
+}
+}

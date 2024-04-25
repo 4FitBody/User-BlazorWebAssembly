@@ -1,0 +1,70 @@
+@page "/Food/GetAll"
+
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ILocalStorageService localStorageService
+@inject NavigationManager navigationManager
+
+
+<PageTitle>Food</PageTitle>
+
+@if (food != null)
+{
+    @foreach (var foodItem in food)
+    {
+        <div class="food-container">
+            <div class="food-details">
+                <h2>@foodItem.Name</h2>
+                <p><strong>Description</strong>@foodItem.Description</p>
+                @if (!string.IsNullOrEmpty(foodItem.ImageUrl))
+                {
+                    <img src="@foodItem.ImageUrl" />
+                }
+                <p><strong>Video URL:</strong> @foodItem.VideoUrl</p>
+                <p><strong>Diet:</strong> @foodItem.Diet</p>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+@code {
+    public class Food
+    {
+        public int Id { get; set; }
+
+        public string? Name { get; set; }
+
+        public string? Description { get; set; }
+
+        public string? VideoUrl { get; set; }
+
+        public string? ImageUrl { get; set; }
+
+        public string? Diet { get; set; }
+
+        public bool IsApproved { get; set; }
+    }
+
+    public IEnumerable<Food> food { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllFoodAsync();
+    }
+
+    private async Task GetAllFoodAsync()
+    {
+        var httpClient = new HttpClient();
+
+        var response = await httpClient.GetAsync("api/Food/Index");
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        food = JsonConvert.DeserializeObject<IEnumerable<Food>>(json);
+
+    }
+}
