@@ -1,0 +1,71 @@
+@page "/Exercises/GetAll"
+
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ILocalStorageService localStorageService
+@inject NavigationManager navigationManager
+
+<PageTitle>Exercise</PageTitle>
+
+@if (exercises != null)
+{
+    @foreach (var ex in exercises)
+    {
+        <div class="exercise-container">
+            <div class="exercise-details">
+                <h2>@ex.Name</h2>
+                <p><strong>Body Part:</strong> @ex.BodyPart</p>
+                <p><strong>Equipment:</strong> @ex.Equipment</p>
+                <p><strong>Target:</strong> @ex.Target</p>
+                <p><strong>Secondary Muscles:</strong> @string.Join(", ", ex.SecondaryMuscles)</p>
+                <p><strong>Instructions:</strong></p>
+                <ul>
+                    @foreach (var instruction in ex.Instructions)
+                    {
+                        <li>@instruction</li>
+                    }
+                </ul>
+            </div>
+            <div class="exercise-gif">
+                <img src="@ex.GifUrl" alt="Exercise GIF" />
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+@code {
+    public class Exercise
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? BodyPart { get; set; }
+        public string? Equipment { get; set; }
+        public string? GifUrl { get; set; }
+        public string? Target { get; set; }
+        public string?[]? SecondaryMuscles { get; set; }
+        public string?[]? Instructions { get; set; }
+        public bool IsApproved { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllExercisesAsync();
+    }
+    public IEnumerable<Exercise> exercises { get; set; }
+
+    private async Task GetAllExercisesAsync()
+    {
+        var httpClient = new HttpClient();
+
+        var response = await httpClient.GetAsync("api/Exercise/Index");
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        exercises = JsonConvert.DeserializeObject<IEnumerable<Exercise>>(json);
+
+    }
+}

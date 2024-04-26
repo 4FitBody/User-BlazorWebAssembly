@@ -1,0 +1,67 @@
+@page "/News/GetAll"
+
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ILocalStorageService localStorageService
+@inject NavigationManager navigationManager
+
+<PageTitle>News</PageTitle>
+
+@if (news != null)
+{
+    @foreach (var newsItem in news)
+    {
+        <div class="news-container">
+            <div class="news-details">
+                <h2>@newsItem.Title</h2>
+                <p><strong>Description</strong>@newsItem.Description</p>
+                @if (!string.IsNullOrEmpty(newsItem.ImageUrl))
+                {
+                    <img src="@newsItem.ImageUrl" />
+                }
+                <p><strong>Creation Date</strong>@newsItem.CreationDate</p>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+
+@code {
+    public class News
+    {
+        public int Id { get; set; }
+
+        public string? Title { get; set; }
+
+        public string? Description { get; set; }
+
+        public string? ImageUrl { get; set; }
+
+        public DateTime? CreationDate { get; set; }
+
+        public bool IsApproved { get; set; }
+    }
+
+    public IEnumerable<News> news { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllNewsAsync();
+    }
+
+    private async Task GetAllNewsAsync()
+    {
+        var httpClient = new HttpClient();
+
+        var response = await httpClient.GetAsync("api/News/Index");
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        news = JsonConvert.DeserializeObject<IEnumerable<News>>(json);
+
+}
+}

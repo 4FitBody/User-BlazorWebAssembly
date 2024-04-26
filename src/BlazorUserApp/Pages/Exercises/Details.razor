@@ -1,0 +1,77 @@
+@page "/Exercises/Details/"
+@inject HttpClient httpClient
+@inject ILocalStorageService LocalStorageService
+@inject NavigationManager navigationManager
+
+<PageTitle>Exercise Details</PageTitle>
+
+@if (exercise != null)
+{
+    <div class="exercise-container">
+        <div class="exercise-details">
+            <h2>@exercise.Name</h2>
+            <p><strong>Body Part:</strong> @exercise.BodyPart</p>
+            <p><strong>Equipment:</strong> @exercise.Equipment</p>
+            <p><strong>Target:</strong> @exercise.Target</p>
+            <p><strong>Secondary Muscles:</strong> @string.Join(", ", exercise.SecondaryMuscles)</p>
+            <p><strong>Instructions:</strong></p>
+            <ul>
+                @foreach (var instruction in exercise.Instructions)
+                {
+                    <li>@instruction</li>
+                }
+            </ul>
+        </div>
+        <div class="exercise-gif">
+            <img src="@exercise.GifUrl" alt="Exercise GIF" />
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    public class Exercise
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? BodyPart { get; set; }
+        public string? Equipment { get; set; }
+        public string? GifUrl { get; set; }
+        public string? Target { get; set; }
+        public string?[]? SecondaryMuscles { get; set; }
+        public string?[]? Instructions { get; set; }
+        public bool IsApproved { get; set; }
+    }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public Exercise exercise { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetExerciseDetailsAsync();
+    }
+
+    private async Task GetExerciseDetailsAsync()
+    {
+
+        var response = await httpClient.GetAsync($"api/Exercises/Details/{Id}");
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        if (response.IsSuccessStatusCode)
+        {
+            exercise = JsonConvert.DeserializeObject<Exercise>(json);
+        }
+        else
+        {
+            navigationManager.NavigateTo("/error");
+        }
+    }
+
+
+}

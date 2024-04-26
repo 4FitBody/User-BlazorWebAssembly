@@ -1,0 +1,78 @@
+@page "/Identity/Register"
+
+@inject ILocalStorageService localStorageService
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authenticationStateProvider
+
+<PageTitle>Register</PageTitle>
+
+<h1>Register</h1>
+
+<EditForm Model="registerDto" OnValidSubmit="OnRegisterFormSubmitAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <label class="form-label d-block">
+        Name:
+        <InputText name="name" class="form-control" @bind-Value=registerDto.Name></InputText>
+    </label>
+
+    <label class="form-label d-block">
+        Surname:
+        <InputText name="surname" class="form-control" @bind-Value=registerDto.Surname></InputText>
+    </label>
+
+    <label class="form-label d-block">
+        Age:
+        <InputNumber min="0" type="number" name="age" class="form-control" @bind-Value=registerDto.Age></InputNumber>
+    </label>
+
+    <label class="form-label d-block">
+        Email:
+        <InputText type="email" name="email" class="form-control" @bind-Value=registerDto.Email></InputText>
+    </label>
+
+    <label class="form-label d-block">
+        Password:
+        <InputText name="password" class="form-control" type="password" @bind-Value=registerDto.Password></InputText>
+    </label>
+
+    <button class="btn btn-primary">Register</button>
+</EditForm>
+
+@code {
+    public class RegisterDto
+    {
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string Surname { get; set; }
+        [Required]
+        public int Age { get; set; }
+        [Required]
+        public string Email { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+
+    public RegisterDto registerDto { get; set; } = new();
+
+    private async Task OnRegisterFormSubmitAsync()
+    {
+        var httpClient = new HttpClient();
+
+        var registerResponse = await httpClient.PostAsJsonAsync("", registerDto);
+
+        if (registerResponse.IsSuccessStatusCode && registerResponse.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            var jwt = await registerResponse.Content.ReadAsStringAsync();
+
+            await localStorageService.SetItemAsStringAsync("jwt", jwt);
+
+            await authenticationStateProvider.GetAuthenticationStateAsync();
+
+            navigationManager.NavigateTo("/");
+        }
+    }
+
+}

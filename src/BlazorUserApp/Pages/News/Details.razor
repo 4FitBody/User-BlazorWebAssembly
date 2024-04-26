@@ -1,0 +1,72 @@
+@page "/News/Details/"
+
+
+@inject HttpClient httpClient
+@inject ILocalStorageService LocalStorageService
+@inject NavigationManager navigationManager
+
+<PageTitle>News Details</PageTitle>
+
+
+@if (news != null)
+{
+    <div class="news-container">
+        <div class="news-details">
+            <h2>@news.Title</h2>
+            <p>@news.Description</p>
+            @if (!string.IsNullOrEmpty(news.ImageUrl))
+            {
+                <img src="@news.ImageUrl" />
+            }
+            <p>@news.CreationDate</p>
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+@code {
+    public class News
+    {
+        public int Id { get; set; }
+
+        public string? Title { get; set; }
+
+        public string? Description { get; set; }
+
+        public string? ImageUrl { get; set; }
+
+        public DateTime? CreationDate { get; set; }
+
+        public bool IsApproved { get; set; }
+    }
+
+    [Parameter]
+    public int Id { get; set; }
+    public News news { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetNewsDetailsAsync();
+    }
+
+    private async Task GetNewsDetailsAsync()
+    {
+
+        var response = await httpClient.GetAsync($"api/News/Details/{Id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            news = await response.Content.ReadFromJsonAsync<News>();
+        }
+        else
+        {
+            navigationManager.NavigateTo("/error");
+        }
+    }
+
+}
