@@ -1,9 +1,55 @@
-﻿@page "/Index"
+﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+    }
 
-<h1>Hello, world!</h1>
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 50px 20px;
+        text-align: center;
+    }
 
-Welcome to your new app.
+    h1 {
+        color: #333;
+        font-size: 48px;
+        margin-bottom: 30px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    p {
+        color: #666;
+        font-size: 18px;
+        margin-bottom: 50px;
+        line-height: 1.6;
+    }
+
+    .cta-button {
+        border: none;
+        color: white;
+        padding: 16px 32px;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        
+    }
+
+    .info {
+        color: #777;
+        font-size: 14px;
+    }
+</style>
+
+<div class="container">
+    <h1>Welcome to 4FitBody</h1>
+    <p>Your personal fitness assistant. Start your journey to a healthier lifestyle today!</p>
+    <a href="/Identity/Login" class="cta-button">Get Started</a>
+</div>
