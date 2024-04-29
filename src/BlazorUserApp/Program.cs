@@ -16,7 +16,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>
 builder.Services.AddAuthorizationCore(options => {
     options.AddPolicy(
         "roles", 
-        builder => builder.RequireRole("user")
+        builder => builder.RequireRole("User")
         );
 });
 
