@@ -13,7 +13,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
     private readonly ILocalStorageService localStorageService;
 
     public CustomAuthStateProvider(
-           ILocalStorageService localStorageService)
+        ILocalStorageService localStorageService)
     {
         this.localStorageService = localStorageService;
         this.jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -31,10 +31,10 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
             new TokenValidationParameters()
             {
                 ValidateAudience = true,
-                ValidAudience = "4FITBODY",
+                ValidAudience = "ForFitBody Inc.",
 
                 ValidateIssuer = true,
-                ValidIssuer = "identity.akshambazari.az",
+                ValidIssuer = "workingstaff.forfitbody.az",
 
                 SignatureValidator = (token, validationParameters) => new JwtSecurityToken(token),
 
@@ -56,7 +56,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
                 {
                     var newJwt = await updateTokenResponse.Content.ReadAsStringAsync();
 
-                    await this.localStorageService.SetItemAsStringAsync("jwt", newJwt);
+                    await this.localStorageService.SetItemAsStringAsync("jwt_access", newJwt);
 
                     var newToken = jwtTokenHandler.ReadJwtToken(newJwt);
 
@@ -74,7 +74,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var jwt = await this.localStorageService.GetItemAsStringAsync("jwt");
+        var jwt = await this.localStorageService.GetItemAsStringAsync("jwt_access");
 
         var claimsIdentity = await this.GetClaimsIdentityAsync(jwt);
 
@@ -86,5 +86,4 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
         return authenticationState;
     }
-
 }
