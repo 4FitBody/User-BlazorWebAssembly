@@ -10,15 +10,17 @@
 
     <main>
         <div class="top-row px-4">
-            <AuthorizeView>
+           <CascadingAuthenticationState>
+             <AuthorizeView>
                 <NotAuthorized>
-                    <a href="/Identity/Login">Login</a>
-                    <a href="/Identity/Registration">Registration</a>
+                    <a class="cta-button" href="/Identity/Login">Login</a>
+                    <a class="cta-button" href="/Identity/Registration">Registration</a>
                 </NotAuthorized>
                 <Authorized>
                     <button @onclick="LogoutAsync">Logout</button>
                 </Authorized>
             </AuthorizeView>
+           </CascadingAuthenticationState>
         </div>
 
         <article class="content px-4">
@@ -34,3 +36,28 @@
         await authenticationStateProvider.GetAuthenticationStateAsync();
     }
 }
+
+<style>
+    a{
+        color: rgba(188, 106, 106, 0.708);
+    }
+
+      .cta-button {
+        background-color:  rgb(64, 26, 131);
+        border: none;
+        color: white;
+        padding: 8px 13px;
+        text-decoration: none !important;
+        display: inline-block;
+        font-size: 15px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+    }
+    
+    a:hover{
+        color: white;
+        text-decoration: none;
+    }
+</style>
