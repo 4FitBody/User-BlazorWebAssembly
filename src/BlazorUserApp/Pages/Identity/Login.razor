@@ -1,5 +1,6 @@
 @page "/Identity/Login"
 
+
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject ILocalStorageService localStorageService
 @inject NavigationManager navigationManager
@@ -30,7 +31,7 @@
     {
         [Required]
         public string Email { get; set; }
-        
+
         [Required]
         public string Password { get; set; }
 
@@ -49,15 +50,20 @@
 
         if (loginResponse.IsSuccessStatusCode && loginResponse.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            var jwt = await loginResponse.Content.ReadAsStringAsync();
+            var json = await loginResponse.Content.ReadAsStringAsync();
 
-            await localStorageService.SetItemAsStringAsync("jwt", jwt);
+            var jwt = Newtonsoft.Json.JsonConvert.DeserializeObject<JwtToken>(json);
+
+            await localStorageService.SetItemAsStringAsync("jwt_access", jwt.AccessToken);
+            await localStorageService.SetItemAsStringAsync("jwt_refresh", jwt.RefreshToken);
 
             await authenticationStateProvider.GetAuthenticationStateAsync();
 
-            navigationManager.NavigateTo("/");
+            navigationManager.NavigateTo($"/Home/");
         }
+
     }
+
 }
 
 <style>
